@@ -6,7 +6,8 @@ Simulate OCT eye scanning.
 - Segmentation of OCT images (DME), Chiu 2015 [[kaggle](https://www.kaggle.com/paultimothymooney/chiu-2015)] [[homepage@duke](https://people.duke.edu/~sf59/Chiu_BOE_2014_dataset.htm)] [[paper](https://opg.optica.org/boe/fulltext.cfm?uri=boe-6-4-1172&id=312754#)]
 - Segmentation of OCT images (AMD), Farsiu 2013 [[kaggle](https://www.kaggle.com/paultimothymooney/farsiu-2014/home)] [[homepage@duke](https://people.duke.edu/~sf59/RPEDC_Ophth_2013_dataset.htm)] [[paper](http://people.duke.edu/~sf59/Farsiu_Ophthalmology_2013.pdf)]
 - AROI dataset, Melinščak 2021 [[homepage](https://ipg.fer.hr/ipg/resources/oct_image_database)]
-- Data on OCT and fundus images for the detection of glaucoma, [[paper](https://www.sciencedirect.com/science/article/pii/S2352340920302365)] [[data](https://data.mendeley.com/datasets/2rnnz5nz74/2)]
+- Data on OCT and fundus images for the detection of glaucoma [[paper](https://www.sciencedirect.com/science/article/pii/S2352340920302365)] [[data](https://data.mendeley.com/datasets/2rnnz5nz74/2)]
+- 
 
 ## Terminology
 
