@@ -7,7 +7,7 @@ Simulate OCT eye scanning.
 - Segmentation of OCT images (AMD), Farsiu 2013 [[kaggle](https://www.kaggle.com/paultimothymooney/farsiu-2014/home)] [[homepage@duke](https://people.duke.edu/~sf59/RPEDC_Ophth_2013_dataset.htm)] [[paper](http://people.duke.edu/~sf59/Farsiu_Ophthalmology_2013.pdf)]
 - AROI dataset, Melinščak 2021 [[homepage](https://ipg.fer.hr/ipg/resources/oct_image_database)]
 - Data on OCT and fundus images for the detection of glaucoma [[paper](https://www.sciencedirect.com/science/article/pii/S2352340920302365)] [[data](https://data.mendeley.com/datasets/2rnnz5nz74/2)]
-- 
+- Peyman Gholami, Priyanka Roy, Mohana Kuppuswamy Parthasarathy, Vasudevan Lakshminarayanan, "OCTID: Optical Coherence Tomography Image Database" [[data](https://dataverse.scholarsportal.info/dataverse/OCTID)]
 
 ## Terminology
 
