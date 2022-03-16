@@ -8,6 +8,7 @@ Simulate OCT eye scanning.
 - AROI dataset, Melinščak 2021 [[homepage](https://ipg.fer.hr/ipg/resources/oct_image_database)]
 - Data on OCT and fundus images for the detection of glaucoma [[paper](https://www.sciencedirect.com/science/article/pii/S2352340920302365)] [[data](https://data.mendeley.com/datasets/2rnnz5nz74/2)]
 - Peyman Gholami, Priyanka Roy, Mohana Kuppuswamy Parthasarathy, Vasudevan Lakshminarayanan, "OCTID: Optical Coherence Tomography Image Database" [[data](https://dataverse.scholarsportal.info/dataverse/OCTID)]
+- Real-Time Automatic Segmentation of Optical Coherence Tomography Volume Data of the Macular Region [[data](http://www.plosone.org/article/fetchSingleRepresentation.action?uri=info:doi/10.1371/journal.pone.0133908.s002)][[paper](https://www.researchgate.net/publication/280944318_Real-Time_Automatic_Segmentation_of_Optical_Coherence_Tomography_Volume_Data_of_the_Macular_Region)]
 
 ## Terminology
 
