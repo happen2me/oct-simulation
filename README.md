@@ -11,6 +11,10 @@ Dataset analysis: [![Datasets Analysis](https://colab.research.google.com/assets
 - OCTID: Optical Coherence Tomography Image Database, Peyman Gholami, Priyanka Roy, Mohana Kuppuswamy Parthasarathy, Vasudevan Lakshminarayanan [[data](https://dataverse.scholarsportal.info/dataverse/OCTID)]
 - Real-Time Automatic Segmentation of Optical Coherence Tomography Volume Data of the Macular Region, Delia Cabrera Debuc [[data](http://www.plosone.org/article/fetchSingleRepresentation.action?uri=info:doi/10.1371/journal.pone.0133908.s002)][[paper](https://www.researchgate.net/publication/280944318_Real-Time_Automatic_Segmentation_of_Optical_Coherence_Tomography_Volume_Data_of_the_Macular_Region)]
 
+## Train with Pix2pix Model
+
+[![Train](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/15z0Wpn032z-PGBG-tObwSbYI9yht_xDW?usp=sharing)
+
 ## Terminology
 
 - OCT: Optical Coherency Tomography
