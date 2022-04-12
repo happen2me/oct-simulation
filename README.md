@@ -9,7 +9,7 @@ Dataset analysis: [![Datasets Analysis](https://colab.research.google.com/assets
 - Segmentation of OCT images (AMD), Farsiu 2013 [[kaggle](https://www.kaggle.com/paultimothymooney/farsiu-2014/home)] [[homepage@duke](https://people.duke.edu/~sf59/RPEDC_Ophth_2013_dataset.htm)] [[paper](http://people.duke.edu/~sf59/Farsiu_Ophthalmology_2013.pdf)]
 - AROI dataset, Melinščak 2021 [[homepage](https://ipg.fer.hr/ipg/resources/oct_image_database)]
 - OCTID: Optical Coherence Tomography Image Database, Peyman Gholami, Priyanka Roy, Mohana Kuppuswamy Parthasarathy, Vasudevan Lakshminarayanan [[data](https://dataverse.scholarsportal.info/dataverse/OCTID)]
-- Real-Time Automatic Segmentation of Optical Coherence Tomography Volume Data of the Macular Region, Delia Cabrera Debuc [[data](http://www.plosone.org/article/fetchSingleRepresentation.action?uri=info:doi/10.1371/journal.pone.0133908.s002)][[paper](https://www.researchgate.net/publication/280944318_Real-Time_Automatic_Segmentation_of_Optical_Coherence_Tomography_Volume_Data_of_the_Macular_Region)]
+- Real-Time Automatic Segmentation of Optical Coherence Tomography Volume Data of the Macular Region, Delia Cabrera Debuc [[data](http://www.plosone.org/article/fetchSingleRepresentation.action?uri=info:doi/10.1371/journal.pone.0133908.s002)][[paper](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0133908)]
 
 ## Train with Pix2pix Model
 
