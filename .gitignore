@@ -1,3 +1,15 @@
+# Project specific
+runs
+results
+checkpoints
+data
+miniconda3
+log
+*.tar.gz
+.vscode
+.data
+pytorch-CycleGAN-and-pix2pix
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
