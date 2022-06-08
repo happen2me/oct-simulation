@@ -1,0 +1,7 @@
+###### Requirements without Version Specifiers ######
+opencv-python
+matplotlib
+tqdm
+numpy
+scipy
+imageio
