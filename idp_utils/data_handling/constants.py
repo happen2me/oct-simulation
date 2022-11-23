@@ -14,7 +14,7 @@ BSCAN_PATTERN = "data/extract/bscans/{data}"
 FLUID_PATTERN = "data/extract/fluids/{data}"
 
 # splited bscans and layers iinto train, val, test
-SPLIT_PATTERN = "data/splits/{data}/{name}"
+SPLIT_PATTERN = "data/splits/{data}/"
 
 # generated datasets
 DATASET_PATTERN = "data/datasets/{data}/{name}"
@@ -42,9 +42,12 @@ BM = 10 * gap
 
 RTA_LABELS = [ILM, RNFL_o, IPL_INL, INL_OPL, OPL_o, IS_OS, OS_RPE, RPE]
 DME_LABELS = [ILM, RNFL_o, IPL_INL, INL_OPL, OPL_o, ISM_ISE, OS_RPE, BM]
-AMD_LABELS = [ILM, RPE, BM]
+AMD_LABELS = [ILM, RPE, BM]  #[19, 171, 190]
 AROI_LABELS = [ILM, IPL_INL, RPE, BM] # [19, 57, 171, 190]
 HETERO_AROI_LABELS = [ILM+3, IPL_INL, RPE+3, BM] # [22, 57, 174, 190]
 OP_LABELS = [ILM, RPE]
 FLUID_LABELS = [80, 160, 240]
 INSTRUMENT_LABELS = [100, 200] # 100 for real instrument, 200 for reflection
+
+# for segmentation
+AROI_LABEL_DICT = { x: i for i, x in enumerate(sorted([0] + AROI_LABELS + FLUID_LABELS))}

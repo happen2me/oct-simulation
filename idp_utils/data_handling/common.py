@@ -12,11 +12,14 @@ from matplotlib import pyplot as plt
 import scipy.io
 import imageio
 import cv2
+import torch
 from PIL import Image
 from idp_utils.data_handling.constants import (INSTRUMENT_LABELS, 
                                                BSCAN_PATTERN,
                                                LAYER_PATTERN,
-                                               FLUID_PATTERN)
+                                               FLUID_PATTERN,
+                                               FLUID_LABELS,
+                                               AROI_LABEL_DICT)
 
 ###### extract layer and bscans from data  ######
 
@@ -52,11 +55,12 @@ def detect_fluids(img, intensities):
                 fluids[coor[0]][coor[1]] = intensity
     return fluids
 
-def extract_data(file_pattern, bscan_key, layermap_key, bscan_format, layermap_format, layer_labels, bscan_folder, layer_folder, 
-                       fluid_folder=None, fluid_key=None, valid_slice_indices_fn=None, remove_from=None, n_remove=0, overwrite=True):
+def extract_data(file_pattern, bscan_key, layermap_key, bscan_format, layermap_format, layer_labels, bscan_folder,
+                 layer_folder, fluid_folder=None, fluid_key=None, valid_slice_indices_fn=None, remove_from=None,
+                 n_remove=0, overwrite=True, save_extension='png'):
     '''
     Extract bscan, corresponding layer images and fluid (if exists) from mat files. Extracted bscans, layers and fluids
-    will be saved as .jpg images to specified bscan and layer folders with the original file name.
+    will be saved as png images by default to specified bscan and layer folders with the original file name.
     If remove_from is specified, n_remove layers randomly sampled from remove_from list will be removed.
     Args:
       file_pattern (str): a pattern leads to mat files, which contains bscans and layermaps, i.e. /path/to/mat/patient*.mat
@@ -72,6 +76,7 @@ def extract_data(file_pattern, bscan_key, layermap_key, bscan_format, layermap_f
       remove_from (list(int)): a list of layers that can be removed
       n_remove (int): number of layers to remove. It should be smaller than the length of remove_from list
       overwrite (bool): overwrite existing files.
+      save_extension (str): the extension of saved images
     '''
     # Create folders for bscan, layer, and fluid
     if not Path(bscan_folder).exists():
@@ -118,7 +123,7 @@ def extract_data(file_pattern, bscan_key, layermap_key, bscan_format, layermap_f
         # Traverse through each slice in a mat
         for s in valid_slice_indices:
             # check existence, this only works when remove_from is None
-            save_name = f.split('/')[-1].split('.')[0] + '_' + str(s) + '.jpg'
+            save_name = f.split('/')[-1].split('.')[0] + '_' + str(s) + '.' + save_extension
             if not overwrite and Path(os.path.join(bscan_folder, save_name)).exists() and Path(os.path.join(layer_folder, save_name)).exists():
                 continue
             # Extract bscan slice directly
@@ -165,17 +170,17 @@ def extract_data(file_pattern, bscan_key, layermap_key, bscan_format, layermap_f
             # Save each slice as a file
             scan_slice_img = Image.fromarray(scan_slice)
             layer_slice_img = Image.fromarray(layer_slice)
-            save_name = f.split('/')[-1].split('.')[0] + '_' + str(s) + '.jpg'
+            save_name = f.split('/')[-1].split('.')[0] + '_' + str(s) + '.' + save_extension
             # If the layer is reduced, append delxxx to its save name
             if remove_from is not None and len(layers_remove) > 0:
-                save_name = save_name.split('.')[0] + '_del' + ''.join(str(x) for x in layers_remove) + '.jpg'
+                save_name = save_name.split('.')[0] + '_del' + ''.join(str(x) for x in layers_remove) + '.' + save_extension
             scan_slice_img.save(os.path.join(bscan_folder, save_name))
             layer_slice_img.save(os.path.join(layer_folder, save_name))
             if fluid_slice is not None:
                 fluid_slice_img = Image.fromarray(fluid_slice)
                 fluid_slice_img.save(os.path.join(fluid_folder, save_name))
 
-def extract_data_aroi(raw_data_folder, bscan_folder, layer_folder, fluid_folder, dtype, 
+def extract_data_aroi(raw_data_folder, bscan_folder, layer_folder, fluid_folder, dtype,
                             fluid_labels, layer_labels, remove_from=None, n_remove=0,
                             save_extension='png'):
     ''' output: bscans, fluids, layers folders with corresponding files
@@ -279,7 +284,7 @@ def extract_data_aroi(raw_data_folder, bscan_folder, layer_folder, fluid_folder,
         scan_slice_img.save(os.path.join(bscan_folder, save_name))
         fluid_slice_img.save(os.path.join(fluid_folder, save_name))
         if remove_from is not None and len(layers_remove) > 0:
-            save_name = save_name.split('.')[0] + '_del' + ''.join(str(x) for x in layers_remove) + '.jpg'
+            save_name = save_name.split('.')[0] + '_del' + ''.join(str(x) for x in layers_remove) + '.' + save_extension
         layer_slice_img.save(os.path.join(layer_folder, save_name))
 
     print("Sum of skipped files: ", skipped_files)
@@ -316,7 +321,9 @@ def extract_data_op(raw_data_folder, bscan_folder, layer_folder, layer_labels, i
                     assert len(instrument_labels) >= len(raw_instrument_labels), \
                         f"instrument_labels ({len(instrument_labels)}) is not enough (expect {len(raw_instrument_labels)})"
                     for i in range(2):
-                        layer_arr[layer_arr == raw_instrument_labels[i]] = INSTRUMENT_LABELS[i]
+                        layer_arr[layer_arr == raw_instrument_labels[i]] = instrument_labels[i]
+                else:
+                    layer_arr[layer_arr == raw_instrument_labels[i]] = INSTRUMENT_LABELS[i]
                 layer_img = Image.fromarray(layer_arr)
                 layer_img.save(os.path.join(layer_folder, layer_name))
             
@@ -492,7 +499,7 @@ def prepare_files(data, dst_folder, train_ratio, test_ratio,
                 print(f"[WARN] dst B-scan or label does not exist for {f}")
                 
 
-def first_occurrence_loss(preds, target, num_classes):
+def first_occurrence_loss(preds, target, num_classes, ignore_fluid=True):
     '''
     This loss computes the difference between the distances from top to the first detection of each class.
     It is normalized by the size of image and by the number of classes.
@@ -519,7 +526,27 @@ def first_occurrence_loss(preds, target, num_classes):
                 edges[i][j-1] = idx
         return edges
     assert preds.shape == target.shape, f"preds and target are expected to be in the same shape. {preds.shape}!={target.shape}"
+    if ignore_fluid:
+        for fluid_label in FLUID_LABELS:
+            fluid_seg_label = AROI_LABEL_DICT[fluid_label]
+            preds[preds==fluid_seg_label] = 0
+            target[target==fluid_seg_label] = 0
     occur_preds = detect_first_occurrence(preds, num_classes)
     occur_target = detect_first_occurrence(target, num_classes)
     loss =  np.abs((occur_target - occur_preds).sum()) / np.prod(preds.shape) / num_classes
     return loss
+
+def dice_loss(seg, real_a, num_classes=8, ignore_fluid=True):
+    import torchmetrics
+
+    dice_score = torchmetrics.Dice(num_classes=num_classes, ignore_index=0)
+
+    if ignore_fluid:
+        for fluid_label in FLUID_LABELS:
+            fluid_seg_label = AROI_LABEL_DICT[fluid_label]
+            seg[seg==fluid_seg_label] = 0
+            real_a[real_a==fluid_seg_label] = 0
+
+    dice_score(seg, real_a)
+    loss = 1- dice_score(seg, real_a)
+    return loss.item()

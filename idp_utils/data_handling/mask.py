@@ -3,6 +3,7 @@ import torch
 
 
 def horizontal_expand_rightward(label, feature, to_expand=20):
+    """Expand the specified feature rightword by to_expand pixels"""
     if isinstance(label, torch.Tensor):
         label_copy = label.clone()
     else:
@@ -10,8 +11,14 @@ def horizontal_expand_rightward(label, feature, to_expand=20):
     x, y = np.where(label_copy == feature)
     xacc, yacc = x, y
     for i in range(to_expand):
-        xacc = np.concatenate([xacc, x])
-        yacc = np.concatenate([yacc, y+i])
+        # To make sure the expansion does not exceed the image boundary
+        expansion_x = x # expand rightward, x axis stays the same
+        expansion_y = y + i
+        # filter out the pixels that exceed the image boundary
+        expansion_x = expansion_x[expansion_y < label.shape[1]]
+        expansion_y = expansion_y[expansion_y < label.shape[1]]
+        xacc = np.concatenate([xacc, expansion_x])
+        yacc = np.concatenate([yacc, expansion_y])
     label_copy[xacc, yacc] = feature
     return label_copy
 
@@ -58,7 +65,7 @@ def expand_label(label, instrument_label=2, mirror_label=4, expansion_instrument
 
 
 def get_dst_shadow(src_label, dst_label, instrument_label=2, mirror_label=4,
-                   top_layer_label=1, margin_above=0, pad_left=0):
+                   top_layer_label=1, margin_above=0, pad_left=0, pad_right=0):
     """Get the shadow of the source label in the destination label, taking
     the instrument and shadow label as well as the layer label in the destination
     into account
@@ -67,22 +74,42 @@ def get_dst_shadow(src_label, dst_label, instrument_label=2, mirror_label=4,
         that the human labeled top layer is inaccurate and leaves some pixels out.
     pad_left: the number of pixels to pad to the left of the shadow. This is for the
         that direct under of the instrument actually includes some layers.
+    pad_right: the number of pixels to pad to the right of the shadow. This is for the
+        that direct under of the instrument actually includes some layers.
     """
-    img_height, _ = src_label.shape
+    img_height, img_width = src_label.shape
     shadow_x = np.array([], dtype=np.int64)
     shadow_y = np.array([], dtype=np.int64)
     # Requirements for the shadow label:
     # 1. Horizontally after the starting of the instrument/mirroring & before the
     #    ending of the instrument/mirroring
     # 2. Vertically below the upper bound of layers
-    x, y = np.where(np.logical_or(src_label == instrument_label,
+    x_src_tool, y_src_tool = np.where(np.logical_or(src_label == instrument_label,
                     src_label == mirror_label))  # (1024, 512)
-    if len(x) == 0:
+    if len(x_src_tool) == 0:
         return shadow_x, shadow_y
-    left_bound = np.min(y)
-    right_bound = np.max(y)
+    left_bound = np.min(y_src_tool)
+    right_bound = np.max(y_src_tool)
+    # Detect left break and right break of the top layer, this is to adjust the left and
+    # right bound of the shadow.
+    for y in range(left_bound, img_width):
+        # If the layer continues to present to the right of left_bound below the tools,
+        # increase left_bound
+        if np.any(src_label[:, y] == top_layer_label):
+            left_bound = y
+        else:
+            break
+    for y in range(right_bound, -1, -1):
+        # If the layer continues to present to the left of right_bound below the tools,
+        # decrease right_bound
+        if np.any(src_label[:, y] == top_layer_label):
+            right_bound = y
+        else:
+            break
     if pad_left + left_bound < right_bound:
         left_bound += pad_left
+    if right_bound - pad_left > left_bound:
+        right_bound -= pad_right
     accumulated_min_upperbound = 0
     for i in range(left_bound, right_bound):
         top_layer = np.where(dst_label[:, i] == top_layer_label)[0]
