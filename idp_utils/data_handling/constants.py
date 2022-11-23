@@ -17,7 +17,7 @@ FLUID_PATTERN = "data/extract/fluids/{data}"
 SPLIT_PATTERN = "data/splits/{data}/"
 
 # generated datasets
-DATASET_PATTERN = "data/datasets/{data}/{name}"
+DATASET_PATTERN = "data/datasets/{data}"
 
 ###### labels: assign value to layers  ######
 
