@@ -67,8 +67,8 @@ def expand_label(label, instrument_label=2, mirror_label=4, expansion_instrument
 def get_dst_shadow(src_label, dst_label, instrument_label=2, mirror_label=4,
                    top_layer_label=1, margin_above=0, pad_left=0, pad_right=0):
     """Get the shadow of the source label in the destination label, taking
-    the instrument and shadow label as well as the layer label in the destination
-    into account
+    the instrument and shadow label in the source as well as the layer label
+    in the destination into account
     Args:
     overflow_above: the margin to include above the top layer. This is for the cases
         that the human labeled top layer is inaccurate and leaves some pixels out.
@@ -132,6 +132,85 @@ def get_dst_shadow(src_label, dst_label, instrument_label=2, mirror_label=4,
                     accumulated_min_upperbound, top_layer_upperbound)
         x_vertical = np.arange(top_layer_upperbound,
                                img_height)  # upperbound to bottom
+        y_vertical = np.full_like(x_vertical, i)
+        shadow_x = np.concatenate([shadow_x, x_vertical])
+        shadow_y = np.concatenate([shadow_y, y_vertical])
+    return shadow_x, shadow_y
+
+
+def get_shadow_below_instruments(label, instrument_label=2, shadow_label=4, img_height=1024):
+    """Get the shadow of the source label, without taking the target label into
+    account. Every pixel below the instrument and shadows are covered.
+    """
+    shadow_x = np.array([], dtype=np.int64)
+    shadow_y = np.array([], dtype=np.int64)
+    # Requirements for the shadow label:
+    # 1. Horizontally after the starting of the instrument/mirroring & before the
+    #    ending of the instrument/mirroring
+    # 2. Vertically below the lower bound of instrument/mirroring
+    x, y = np.where(np.logical_or(label==instrument_label, label==shadow_label)) # (1024, 512)
+    if len(x) == 0:
+        return shadow_x, shadow_y
+    left_bound = np.min(y)
+    right_bound = np.max(y)
+    accumulated_min_lowerbound = 0
+    for i in range(left_bound, right_bound):
+        instrument_above = np.where(np.logical_or(label[:, i] == instrument_label, label[:, i] == shadow_label))[0]
+        if len(instrument_above) == 0:
+            if accumulated_min_lowerbound == 0:
+                continue
+            else:
+                # set to current recorded lowest shadow
+                instrument_lowerbound = accumulated_min_lowerbound
+        else:
+            # print("instrument_above", instrument_above, len(instrument_above))
+            instrument_lowerbound = np.max(instrument_above)
+            if accumulated_min_lowerbound == 0:
+                # initialize
+                accumulated_min_lowerbound = instrument_lowerbound
+            else:
+                accumulated_min_lowerbound = max(accumulated_min_lowerbound, instrument_lowerbound)
+        x_vertical = np.arange(instrument_lowerbound, img_height) # upperbound to bottom
+        y_vertical = np.full_like(x_vertical, i)
+        shadow_x = np.concatenate([shadow_x, x_vertical])
+        shadow_y = np.concatenate([shadow_y, y_vertical])
+    return shadow_x, shadow_y
+
+
+def get_shadow_below_top_layer(label, instrument_label=2, shadow_label=4, top_layer_label=1,
+                               img_width=512, img_height=1024):
+    """Covers instruments, mirroring and the shadows below the highest point of
+    upper layers
+    """
+    shadow_x = np.array([], dtype=np.int64)
+    shadow_y = np.array([], dtype=np.int64)
+    # Requirements for the shadow label:
+    # 1. Horizontally after the starting of the instrument/mirroring & before the
+    #    ending of the instrument/mirroring
+    # 2. Vertically below the (upperbound of) label 1
+    x, y = np.where(np.logical_or(label==instrument_label,
+                                  label==shadow_label)) # (1024, 512)
+    if len(x) == 0:
+        return shadow_x, shadow_y
+    left_bound = np.min(y)
+    right_bound = np.max(y)
+    x, y = np.where(label==top_layer_label)
+    upper_bound = np.min(x)
+    left_end = upper_bound
+    right_end = upper_bound
+    for i in (left_bound, 0, -1):
+        left_1 = np.where(label[:, i]==top_layer_label)[0]
+        if len(left_1) > 0:
+            left_end = left_1[0]
+            break
+    for i in range(right_bound, img_width):
+        right_1 = np.where(label[:, i]==top_layer_label)[0]
+        if len(right_1) > 0:
+            right_end = right_1[0]
+            break
+    upper_bound = max(upper_bound, min(left_end, right_end))
+    for i in range(left_bound, right_bound):
+        x_vertical = np.arange(upper_bound, img_height) # upperbound to bottom
         y_vertical = np.full_like(x_vertical, i)
         shadow_x = np.concatenate([shadow_x, x_vertical])
         shadow_y = np.concatenate([shadow_y, y_vertical])
