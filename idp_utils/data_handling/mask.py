@@ -177,7 +177,7 @@ def get_shadow_below_instruments(label, instrument_label=2, shadow_label=4, img_
     return shadow_x, shadow_y
 
 
-def get_shadow_below_top_layer(label, instrument_label=2, shadow_label=4, top_layer_label=1,
+def get_shadow_below_top_layer(label, instrument_label=2, mirror_label=4, top_layer_label=1,
                                img_width=512, img_height=1024):
     """Covers instruments, mirroring and the shadows below the highest point of
     upper layers
@@ -189,7 +189,7 @@ def get_shadow_below_top_layer(label, instrument_label=2, shadow_label=4, top_la
     #    ending of the instrument/mirroring
     # 2. Vertically below the (upperbound of) label 1
     x, y = np.where(np.logical_or(label==instrument_label,
-                                  label==shadow_label)) # (1024, 512)
+                                  label==mirror_label)) # (1024, 512)
     if len(x) == 0:
         return shadow_x, shadow_y
     left_bound = np.min(y)
