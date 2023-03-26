@@ -3,3 +3,6 @@
 	path = submodules/pix2pix
 	url = https://github.com/happen2me/pytorch-CycleGAN-and-pix2pix.git
 	branch = yuanchun
+[submodule "spade"]
+	path = submodules/spade
+	url = https://github.com/happen2me/SPADE.git
