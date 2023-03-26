@@ -7,6 +7,7 @@ from . import constants as C
 
 Label = namedtuple("Label", "instrument mirror ilm ipl rpe bm", defaults=(None,)*6)
 unified_label = Label(instrument=1, mirror=2, ilm=3, ipl=4, rpe=5, bm=6)
+diff_label = Label(ilm=7, rpe=8) # this is useful when we want to set ilm and rpe with different labels in different datasets
 aroi_label = Label(ilm=C.ILM, ipl=C.IPL_INL, rpe=C.RPE, bm=C.BM)
 # we did not transform the op dataset, so we directly use the original labels
 op_label = Label(instrument=2, mirror=4, ilm=1, rpe=3)

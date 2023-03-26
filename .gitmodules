@@ -2,3 +2,4 @@
 [submodule "pix2pix"]
 	path = submodules/pix2pix
 	url = https://github.com/happen2me/pytorch-CycleGAN-and-pix2pix.git
+	branch = yuanchun

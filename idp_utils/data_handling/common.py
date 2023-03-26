@@ -314,16 +314,17 @@ def extract_data_op(raw_data_folder, bscan_folder, layer_folder, layer_labels, i
 
             for layer in layers:
                 layer_name = folder_name + "-" + layer.split('/')[-1].split('.')[0] + '.' + save_extension
-                layer_arr = np.asarray(Image.open(layer))
+                layer_arr = np.array(Image.open(layer))
+                original_layer_arr = layer_arr.copy()
                 for i in range(2):
-                    layer_arr[layer_arr == raw_layer_labels[i]] = layer_labels[i]
+                    layer_arr[original_layer_arr == raw_layer_labels[i]] = layer_labels[i]
                 if instrument_labels:
                     assert len(instrument_labels) >= len(raw_instrument_labels), \
                         f"instrument_labels ({len(instrument_labels)}) is not enough (expect {len(raw_instrument_labels)})"
                     for i in range(2):
-                        layer_arr[layer_arr == raw_instrument_labels[i]] = instrument_labels[i]
+                        layer_arr[original_layer_arr == raw_instrument_labels[i]] = instrument_labels[i]
                 else:
-                    layer_arr[layer_arr == raw_instrument_labels[i]] = INSTRUMENT_LABELS[i]
+                    layer_arr[original_layer_arr == raw_instrument_labels[i]] = INSTRUMENT_LABELS[i]
                 layer_img = Image.fromarray(layer_arr)
                 layer_img.save(os.path.join(layer_folder, layer_name))
             

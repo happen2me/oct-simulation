@@ -18,7 +18,9 @@ def visualize_segmentation(bscan, label, show_original=False, alpha=0.8):
         3: 'gray',
         4: 'orange',
         5: 'yellow',
-        6: 'gainsboro'
+        6: 'gainsboro',
+        7: 'white',
+        8: 'white',
     }
     if show_original:
         fig, axs = plt.subplots(1, 2, figsize=(5, 10))
